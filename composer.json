@@ -1,0 +1,59 @@
+{
+  "name": "antevemus/aspecification-rabbitmq",
+  "description": "RabbitMQ satellite of antevemus/aspecification: a transport with publisher confirms and mandatory routing, and a source on quorum queues with manual acks, x-delivery-count, ordered requeue and a dead letter exchange, for the messaging hook of the core",
+  "type": "library",
+  "license": "MIT",
+  "homepage": "https://github.com/antevemus-it/Antevemus.ASpecificationRabbitMQ",
+  "support": {
+    "source": "https://github.com/antevemus-it/Antevemus.ASpecificationRabbitMQ",
+    "issues": "https://github.com/antevemus-it/Antevemus.ASpecificationRabbitMQ/issues",
+    "docs": "https://github.com/antevemus-it/Antevemus.ASpecificationRabbitMQ#readme"
+  },
+  "keywords": [
+    "specification",
+    "messaging",
+    "rabbitmq",
+    "amqp",
+    "outbox",
+    "inbox",
+    "publisher-confirms",
+    "quorum-queue",
+    "dead-letter",
+    "php82"
+  ],
+  "authors": [
+    {
+      "name": "Heliton Junior - CTO @ Antevemus Soluções Inovadoras em TI Ltda.",
+      "email": "contato@antevemus.com.br",
+      "homepage": "https://antevemus.com.br"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "ext-mbstring": "*",
+    "ext-sockets": "*",
+    "antevemus/aspecification": "^2.14",
+    "php-amqplib/php-amqplib": "^3.7"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.0",
+    "infection/infection": "^0.31.9 || ^0.35.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "Antevemus\\ASpecificationRabbitMQ\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Antevemus\\ASpecificationRabbitMQ\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "allow-plugins": {
+      "infection/extension-installer": false
+    }
+  }
+}

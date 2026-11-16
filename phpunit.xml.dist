@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PHPUnit configuration for antevemus/aspecification-rabbitmq.
+
+  Coverage is not configured by default so that the run does not require Xdebug or PCOV.
+
+  The groups Contract (the RabbitMQ half), Broker and Property, and the blocks of the documentation that talk to
+  a broker, need a RabbitMQ 3.13 (quorum queues): they are skipped, with the reason, when it cannot be reached.
+  The broker is read from the environment (the values below are the defaults; a variable set outside wins):
+
+    docker run -d -p 5672:5672 rabbitmq:3.13
+    RABBITMQ_HOST=127.0.0.1 RABBITMQ_PORT=5672 vendor/bin/phpunit
+
+  Each test declares exchanges and queues of its own, under unique names, and removes them at the end.
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnSkippedTests="true"
+         failOnWarning="true"
+         failOnDeprecation="true"
+         failOnRisky="true">
+
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Contract">
+            <directory>tests/Contract</directory>
+        </testsuite>
+        <testsuite name="Broker">
+            <directory>tests/Broker</directory>
+        </testsuite>
+        <testsuite name="Property">
+            <directory>tests/Property</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+
+    <php>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="512M"/>
+        <env name="RABBITMQ_HOST" value="127.0.0.1"/>
+        <env name="RABBITMQ_PORT" value="5672"/>
+        <env name="RABBITMQ_USER" value="guest"/>
+        <env name="RABBITMQ_PASSWORD" value="guest"/>
+        <env name="RABBITMQ_VHOST" value="/"/>
+    </php>
+</phpunit>

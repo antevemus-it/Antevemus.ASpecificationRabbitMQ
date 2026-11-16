@@ -1,0 +1,55 @@
+name: Quality
+
+# Mutation testing with Infection over the whole src/, with the minimum scores of infection.json5 (measured
+# locally for 1.0.0, set one point below), against a real RabbitMQ 3.13: most of src/ is only exercised by the
+# tests that talk to the broker.
+on:
+  schedule:
+    # Mondays, 07:53 UTC.
+    - cron: '53 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  mutation:
+    name: Mutation testing of src/ (Infection, PHP 8.4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    services:
+      rabbitmq:
+        image: rabbitmq:3.13
+        ports:
+          - 5672:5672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 20
+    env:
+      RABBITMQ_HOST: 127.0.0.1
+      RABBITMQ_PORT: 5672
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: sockets, mbstring
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Infection
+        run: vendor/bin/infection --threads=max --only-covering-test-cases --no-interaction --no-progress --logger-github=false
+
+      - name: Summary
+        if: always()
+        run: cat coverage/infection/summary.log || true

@@ -1,0 +1,57 @@
+{
+  "items": [
+    {
+      "text": "Início",
+      "path": "index"
+    },
+    {
+      "text": "Primeiros passos",
+      "items": [
+        {
+          "text": "Instalação e início rápido",
+          "path": "getting-started/index"
+        }
+      ]
+    },
+    {
+      "text": "Conceitos",
+      "items": [
+        {
+          "text": "Topologia e publisher confirms",
+          "path": "concepts/topology-and-confirms"
+        },
+        {
+          "text": "Entrega, ordem e mensagens mortas",
+          "path": "concepts/delivery-and-ordering"
+        }
+      ]
+    },
+    {
+      "text": "Referência da API",
+      "items": [
+        {
+          "text": "Referência da API",
+          "path": "api/reference"
+        }
+      ]
+    },
+    {
+      "text": "Qualidade",
+      "items": [
+        {
+          "text": "Testes",
+          "path": "quality/tests"
+        }
+      ]
+    },
+    {
+      "text": "Projeto",
+      "items": [
+        {
+          "text": "Roadmap",
+          "path": "project/roadmap"
+        }
+      ]
+    }
+  ]
+}
