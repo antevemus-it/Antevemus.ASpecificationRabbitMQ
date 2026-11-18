@@ -55,7 +55,7 @@ License, and adapted (the table of blocks; the blocks that talk to a broker).
 Runtime, installed by Composer as separate packages, each with its own license
 file; none of them is copied into or distributed with this package:
 
-- antevemus/aspecification (^2.14, MIT, by the same author), which brings
+- antevemus/aspecification (^2.15, MIT, by the same author), which brings
   antevemus/adeep-property-access (MIT, same author) and the Symfony polyfills
   symfony/polyfill-mbstring and symfony/polyfill-php82 (MIT).
 - php-amqplib/php-amqplib (^3.7, LGPL-2.1-or-later), the AMQP 0-9-1 client,

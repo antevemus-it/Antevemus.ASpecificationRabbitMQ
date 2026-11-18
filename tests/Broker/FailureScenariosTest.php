@@ -8,7 +8,6 @@ use Antevemus\ASpecification\Messaging\ConsumeReport;
 use Antevemus\ASpecification\Messaging\Exceptions\MessagingException;
 use Antevemus\ASpecification\Messaging\Inbox\InMemoryProcessedMessageStore;
 use Antevemus\ASpecification\Messaging\IMessageSource;
-use Antevemus\ASpecification\Messaging\IMessageTransport;
 use Antevemus\ASpecification\Messaging\Message;
 use Antevemus\ASpecification\Messaging\MessageConsumer;
 use Antevemus\ASpecification\Messaging\MessageHandlerRegistry;
@@ -16,25 +15,26 @@ use Antevemus\ASpecification\Messaging\MessagePublisher;
 use Antevemus\ASpecification\Messaging\Outbox\InMemoryMessageOutbox;
 use Antevemus\ASpecification\Messaging\Outbox\MessageOutboxStatus;
 use Antevemus\ASpecification\Messaging\OutboxRelay;
-use Antevemus\ASpecification\Messaging\ReceivedMessage;
 use Antevemus\ASpecification\Messaging\RelayReport;
-use Antevemus\ASpecification\Messaging\TransportSendResult;
 use Antevemus\ASpecification\StateMachine\Persistence\InMemory\InMemoryTransactionManager;
 use Antevemus\ASpecificationRabbitMQ\RabbitMqConnector;
 use Antevemus\ASpecificationRabbitMQ\RabbitMqSource;
 use Antevemus\ASpecificationRabbitMQ\RabbitMqTransport;
 use Antevemus\ASpecificationRabbitMQ\Tests\Support\EffectLog;
-use Antevemus\ASpecificationRabbitMQ\Tests\Support\TestBroker;
 use Antevemus\ASpecificationRabbitMQ\Tests\Support\TestMessages;
 use RuntimeException;
 use Throwable;
 
 /**
- * The failures of D13 against the real broker: a relay that dies between the confirm and the mark, a consumer
- * whose connection is cut with deliveries unanswered, a broker that cannot be reached, a message no queue is
- * bound for, and the secrecy of every reason, exception and report on the way.
+ * The failures of D13 that are RabbitMQ's own, against the real broker: a consumer whose socket is cut with
+ * deliveries unanswered (the acknowledgement fails with the source's exception; the broker gives everything back
+ * with `x-delivery-count` raised), a broker that cannot be reached (the reason of the connector, never its
+ * password), a message no queue is bound for (the mandatory flag, 312 NO_ROUTE), and the secrecy of the AMQP
+ * headers of a dead letter and of a connection error. What the contract promises on every broker (a relay that
+ * dies between the confirmation and the mark, a lost connection, the secrecy of every reason and report) is the
+ * contract battery of the core (RabbitMqContractTest).
  *
- * @version    1.0.0
+ * @version    1.0.1
  * @package    Antevemus\ASpecificationRabbitMQ\Tests
  * @subpackage Broker
  */
@@ -55,43 +55,6 @@ final class FailureScenariosTest extends BrokerTestCase
         $this->outbox = new InMemoryMessageOutbox();
         $this->inbox = new InMemoryProcessedMessageStore();
         $this->effects = new EffectLog();
-    }
-
-    public function testARelayThatDiesBetweenTheConfirmAndTheMarkSendsAgainAndTheEffectRunsOnce(): void
-    {
-        $queue = $this->queue();
-        $transport = new RabbitMqTransport($this->connector, $this->topology);
-        $dying = new class ($transport) implements IMessageTransport {
-            public bool $die = true;
-
-            public function __construct(private readonly IMessageTransport $inner)
-            {
-            }
-
-            public function send(array $batch): TransportSendResult
-            {
-                $result = $this->inner->send($batch);
-                if ($this->die) {
-                    // The broker confirmed; the process dies before the outbox is marked.
-                    throw new RuntimeException('process killed');
-                }
-
-                return $result;
-            }
-        };
-        (new MessagePublisher($this->outbox))->publish(TestMessages::make('A', key: 'a'), TestMessages::make('B', key: 'b'));
-
-        $died = (new OutboxRelay($this->outbox, $dying))->relayPending(100);
-        $afterDeath = $this->outbox->find(TestMessages::idOf('A'))?->status;
-        $dying->die = false;
-        $restarted = (new OutboxRelay($this->outbox, $dying))->relayPending(100);
-        $report = $this->consumer($this->bench->sourceOn($queue))->consume(100, 0);
-
-        self::assertSame(0, $died->deliveredCount());
-        self::assertSame(MessageOutboxStatus::FAILED, $afterDeath, 'not marked delivered: to be sent again');
-        self::assertSame(2, $restarted->deliveredCount());
-        self::assertSame(['A handled 1', 'B handled 1', 'A duplicate 1', 'B duplicate 1'], TestMessages::transcript($report));
-        self::assertSame(['A', 'B'], $this->effects->all());
     }
 
     public function testDeliveriesOfAConsumerWhoseConnectionIsCutGoToAnotherConsumer(): void
@@ -156,49 +119,37 @@ final class FailureScenariosTest extends BrokerTestCase
         self::assertSecret($lost);
     }
 
-    public function testNothingOnTheWayRepeatsThePayload(): void
+    public function testNoDeadLetterHeaderNorConnectionErrorRepeatsASecret(): void
     {
         $queue = $this->queue();
-        $payload = ['cpf' => self::SECRET];
-        $outbox = $this->publish(
-            TestMessages::make('A', key: 'a', payload: $payload),
-            TestMessages::make('B', key: 'b', payload: $payload),
-            TestMessages::make('C', name: 'livechat.message_received.v1', payload: $payload),
-            TestMessages::make('D', tenant: 'globex', payload: $payload),
-        );
-        $relayed = (new OutboxRelay($outbox, new RabbitMqTransport($this->connector, $this->topology)))->relayPending(100);
+        $outbox = $this->publish(TestMessages::make('A', key: 'a', tenant: 'acme', payload: ['cpf' => self::SECRET], headers: ['trace-id' => 't-1']));
+        (new OutboxRelay($outbox, new RabbitMqTransport($this->connector, $this->topology)))->relayPending(100);
         $this->broker->publishRaw($this->topology->exchange(), 'crm.lead_created.v1', '{"cpf": "' . self::SECRET . '", ');
         $errors = [];
-        $source = $this->bench->sourceOn($queue);
-        $consumer = $this->consumer($source, failing: ['A', 'B'], maxDeliveries: 1, onError: function (Message $m, Throwable $e) use (&$errors): void {
+        $consumer = $this->consumer($this->bench->sourceOn($queue), failing: ['A'], maxDeliveries: 1, onError: function (Message $m, Throwable $e) use (&$errors): void {
             $errors[] = $e->getMessage();
         });
 
         $report = $consumer->consume(100, 0);
         $dead = $this->broker->drain($this->topology->deadLetterQueueOf($queue));
-        $deliveries = $source->receive(10, 0);
-        try {
-            $source->ack(ReceivedMessage::invalid(1, '7.7', 'x'));
-        } catch (MessagingException $e) {
-            $exception = $e->getMessage();
-        }
 
-        self::assertSame(['A dead_lettered 1', 'B dead_lettered 1', 'C unknown_name 1', 'D handled 1', 'invalid dead_lettered 1'], TestMessages::transcript($report));
-        self::assertCount(3, $dead);
-        self::assertSame([], $deliveries);
-        self::assertStringContainsString(self::SECRET, $errors[0], 'the handler\'s own exception, given to onHandlerError, does quote it');
-        self::assertSecret($relayed);
-        self::assertSecret($report);
+        self::assertSame(['A dead_lettered 1', 'invalid dead_lettered 1'], TestMessages::transcript($report));
+        self::assertStringContainsString(self::SECRET, $errors[0] ?? '', 'the handler\'s own exception, given to onHandlerError, does quote it');
+        self::assertCount(2, $dead, 'the message and the body that is not one');
         foreach ($dead as $letter) {
-            self::assertStringNotContainsString(self::SECRET, json_encode($letter->get('application_headers')->getNativeData(), JSON_THROW_ON_ERROR));
+            $headers = $letter->get('application_headers')->getNativeData();
+            self::assertSame($queue, $headers['aspec-dead-queue'] ?? null);
+            self::assertSame(1, $headers['aspec-dead-delivery-count'] ?? null);
+            self::assertNotSame('', trim((string) ($headers['aspec-dead-reason'] ?? '')), 'a dead letter carries its reason');
+            self::assertStringNotContainsString(self::SECRET, json_encode($headers, JSON_THROW_ON_ERROR), 'no header of a dead letter (the ones copied from the original included) repeats the payload');
         }
-        self::assertStringNotContainsString(self::SECRET, $exception ?? '');
         $unreachable = new RabbitMqSource(new RabbitMqConnector('127.0.0.1', 1, 'guest', self::SECRET), $queue);
         try {
             $unreachable->receive(1, 0);
             self::fail('no exception');
         } catch (MessagingException $e) {
-            self::assertStringNotContainsString(self::SECRET, $e->getMessage());
+            self::assertStringStartsWith(sprintf('The RabbitMQ source could not receive from queue "%s" at amqp://127.0.0.1:1/ (AMQPIOException: ', $queue), $e->getMessage());
+            self::assertStringNotContainsString(self::SECRET, $e->getMessage(), 'nor the password of the connector');
             self::assertStringNotContainsString(self::SECRET, (string) $e);
         }
     }

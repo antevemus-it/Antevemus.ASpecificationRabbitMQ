@@ -60,7 +60,7 @@ The official documentation lives in [docs/en](docs/en/index.md) (and in Portugue
 | [Topology and publisher confirms](docs/en/concepts/topology-and-confirms.md) | The topic exchange, the quorum queues and their patterns, the dead letter exchange, the confirms and the mandatory flag. |
 | [Delivery, ordering and dead letters](docs/en/concepts/delivery-and-ordering.md) | At least once plus the inbox, the pull, the order of a key across requeues and crashes, the dead letters. |
 | [API reference](docs/en/api/reference.md) | `RabbitMqConnector`, `RabbitMqTopology`, `RabbitMqTransport` and `RabbitMqSource`. |
-| [Tests](docs/en/quality/tests.md) | The contract battery over the core and over RabbitMQ, the failures, the property and the mutation testing. |
+| [Tests](docs/en/quality/tests.md) | The contract battery of the core run against RabbitMQ (how a satellite wires it: [Writing a satellite](https://github.com/antevemus-it/Antevemus.ASpecification/blob/main/docs/en/messaging/writing-a-satellite.md) of the core), the tests of what is RabbitMQ's own, and the mutation testing. |
 | [Roadmap](docs/en/project/roadmap.md) | What shipped and what may come. |
 
 ## License

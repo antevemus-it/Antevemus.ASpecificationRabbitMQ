@@ -4,6 +4,20 @@ All notable changes to this package are recorded here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-18
+
+### Changed
+
+- Tests: the suite runs the public contract battery of the core, `MessagingContractTestCase` of `antevemus/aspecification` 2.15.0 (`Antevemus\ASpecification\Messaging\Testing`), against RabbitMQ, in place of the private battery of 1.0.0. `RabbitMqContractTest` extends it, and `tests/Support/RabbitMqBench.php` is now an `IMessagingBench` of the core: per instance unique exchanges, per consumer a quorum queue of a unique name bound by the message names it reads, a successor and a restarted process as a new connection once the socket of the dead one is cut and the broker gave back what it held, a lost connection as a transport whose socket is cut as soon as it opens, and the dead letters read from the dead letter queue. The battery brings what the private one did not have: a process started again, a lost connection, a raw body per message name, the secrecy of every reason, report and exception, the order of a key across message names, two benches alive at the same time, and a property sequence of six seeds (the three of 1.0.0 among them). It compares the order within an ordering key and the multiset of the rest; the private battery also compared the order between keys, which the contract does not promise.
+- Tests: removed the private battery (`tests/Contract/MessagingContractTestCase.php`), its run over the in-memory pair of the core (`InMemoryContractTest`, `InMemoryBench`; the core runs the battery against its reference), the private bench interface (`tests/Support/MessagingBench.php`) and the private property test (`tests/Property/InterleavingPropertyTest.php`, covered by the property sequence of the battery: its seeds, its deaths of the relay and of the consumer, its poison messages and its assertions). From `FailureScenariosTest`, the relay that dies between the confirm and the mark (a scenario of the battery) left, and the secrecy sweep keeps what is RabbitMQ's own: the AMQP headers of a dead letter and the error of a source that cannot reach the broker. The tests of the topology, the connector, AMQP and the failures that are RabbitMQ's own stay.
+- Documentation: the pages on the tests, the READMEs and the roadmap point to the battery of the core and to its manual for authors of a satellite, [Writing a satellite](https://github.com/antevemus-it/Antevemus.ASpecification/blob/main/docs/en/messaging/writing-a-satellite.md).
+
+### Notes
+
+- The API does not change: `src/` is the one of 1.0.0, and the battery of the core passed against it with no change.
+- The floor of the core rises from `^2.14` to `^2.15`, the first version that ships the battery (a requirement of the tests of this package; the code of `src/` uses only the messaging hook of 2.14.0).
+- Suite: 164 tests, 4 275 assertions with a broker (98 run and 66 skipped without one): Unit 108, Contract 27 (the 22 scenarios of the battery, the property sequence once per seed), Broker 29. Before, on the same broker: 168 tests, 1 805 assertions. Mutation testing over the whole `src/`, unchanged: 274 mutants, 269 killed, 1 time-out, 4 escaped, all equivalent; MSI 98.54%.
+
 ## [1.0.0] - 2026-11-15
 
 ### Added

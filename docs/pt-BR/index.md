@@ -22,11 +22,11 @@ A documentação oficial do pacote, uma página por tema. As mesmas páginas exi
 
 ### Qualidade
 
-- [Testes](quality/tests.md): A bateria de contrato sobre o núcleo e sobre o RabbitMQ, as falhas, a propriedade e o teste de mutação.
+- [Testes](quality/tests.md): A bateria de contrato do núcleo rodada contra o RabbitMQ, os testes do que é próprio do RabbitMQ, e o teste de mutação.
 
 ### Projeto
 
-- [Roadmap](project/roadmap.md): A versão publicada e o que pode vir depois.
+- [Roadmap](project/roadmap.md): As versões publicadas e o que pode vir depois.
 
 ## Onde Está Cada Coisa
 

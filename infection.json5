@@ -1,4 +1,4 @@
-// Mutation testing of antevemus/aspecification-rabbitmq (1.0.0): the whole src/. Runs in the scheduled workflow
+// Mutation testing of antevemus/aspecification-rabbitmq (1.0.1): the whole src/. Runs in the scheduled workflow
 // (.github/workflows/quality.yml) with a coverage driver (pcov) and a RabbitMQ 3.13 service (most of src/ is only
 // exercised by the tests that talk to the broker); locally, with a broker reachable (see phpunit.xml.dist):
 //
@@ -6,8 +6,10 @@
 //       --initial-tests-php-options="-d pcov.enabled=1 -d pcov.directory=$PWD/src"
 //
 // Measured on 2026-11-15 (1.0.0 against ASpecification 2.14.0 and RabbitMQ 3.13, Infection 0.35.11, PHP 8.4.27
-// with pcov): 274 mutants, 269 killed, 1 time-out (the deadline of the wait moved to the future: an endless poll),
-// 0 errors, 4 escaped, all equivalent, all in the wait of RabbitMqSource::receive(). They come from a pool of seven
+// with pcov), and again on 2026-11-18 (1.0.1, the contract battery of ASpecification 2.15.0 in place of the
+// private one, Infection 0.35.12), with the same result: 274 mutants, 269 killed, 1 time-out (the deadline of the
+// wait moved to the future: an endless poll), 0 errors, 4 escaped, all equivalent, all in the wait of
+// RabbitMqSource::receive(). They come from a pool of seven
 // equivalents of the clock of the wait, of which the timing tests kill some in one run and others in the next
 // (two runs of the same code: the same 4 escaped, not the same 4 mutants):
 // - IncrementInteger/DecrementInteger of `$waitMs * 1_000_000` (999 999 or 1 000 001 nanoseconds per millisecond:

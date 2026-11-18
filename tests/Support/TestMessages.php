@@ -11,9 +11,10 @@ use DateTimeImmutable;
 
 /**
  * Messages with an alias: the id of each one is derived from its alias (a valid ULID), and a transcript names
- * each message by its alias, so the expected transcripts of the battery are short and the same for every bench.
+ * each message by its alias, so the expected transcripts of the broker tests are short (the contract battery of
+ * the core has aliases of its own).
  *
- * @version    1.0.0
+ * @version    1.0.1
  * @package    Antevemus\ASpecificationRabbitMQ\Tests
  * @subpackage Support
  */

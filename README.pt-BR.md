@@ -60,7 +60,7 @@ A documentação oficial fica em [docs/pt-BR](docs/pt-BR/index.md) (e em inglês
 | [Topologia e publisher confirms](docs/pt-BR/concepts/topology-and-confirms.md) | A exchange `topic`, as quorum queues e seus padrões, a exchange de mensagens mortas, os confirms e a flag mandatory. |
 | [Entrega, ordem e mensagens mortas](docs/pt-BR/concepts/delivery-and-ordering.md) | Pelo menos uma vez mais a inbox, o pull, a ordem de uma chave através de requeues e quedas, as mensagens mortas. |
 | [Referência da API](docs/pt-BR/api/reference.md) | `RabbitMqConnector`, `RabbitMqTopology`, `RabbitMqTransport` e `RabbitMqSource`. |
-| [Testes](docs/pt-BR/quality/tests.md) | A bateria de contrato sobre o núcleo e sobre o RabbitMQ, as falhas, a propriedade e o teste de mutação. |
+| [Testes](docs/pt-BR/quality/tests.md) | A bateria de contrato do núcleo rodada contra o RabbitMQ (como um satélite a liga: [Escrevendo um satélite](https://github.com/antevemus-it/Antevemus.ASpecification/blob/main/docs/pt-BR/messaging/writing-a-satellite.md) do núcleo), os testes do que é próprio do RabbitMQ, e o teste de mutação. |
 | [Roadmap](docs/pt-BR/project/roadmap.md) | O que foi entregue e o que pode vir. |
 
 ## Licença

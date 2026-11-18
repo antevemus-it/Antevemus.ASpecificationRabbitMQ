@@ -8,7 +8,7 @@ Instale via Composer:
 composer require antevemus/aspecification-rabbitmq
 ```
 
-Requisitos: PHP 8.2 ou mais novo com `ext-sockets` e `ext-mbstring`, e um RabbitMQ 3.13 ou mais novo (as filas são quorum queues). Vêm junto: [`antevemus/aspecification`](https://github.com/antevemus-it/Antevemus.ASpecification) `^2.14` (o núcleo, do mesmo autor, que tem o gancho de mensageria) e [`php-amqplib/php-amqplib`](https://github.com/php-amqplib/php-amqplib) `^3.7` (um cliente AMQP 0-9-1 em PHP puro; a extensão PECL `amqp` não é necessária).
+Requisitos: PHP 8.2 ou mais novo com `ext-sockets` e `ext-mbstring`, e um RabbitMQ 3.13 ou mais novo (as filas são quorum queues). Vêm junto: [`antevemus/aspecification`](https://github.com/antevemus-it/Antevemus.ASpecification) `^2.15` (o núcleo, do mesmo autor, que tem o gancho de mensageria) e [`php-amqplib/php-amqplib`](https://github.com/php-amqplib/php-amqplib) `^3.7` (um cliente AMQP 0-9-1 em PHP puro; a extensão PECL `amqp` não é necessária).
 
 Para que serve: levar as mensagens do gancho de mensageria do núcleo entre os módulos de uma aplicação pelo RabbitMQ. A aplicação publica na outbox do núcleo, dentro da própria transação; o relay do núcleo envia a outbox com o `RabbitMqTransport`; cada consumidor lê a própria fila com o `RabbitMqSource`, pelo `MessageConsumer` do núcleo, que deduplica por uma inbox. A entrega é pelo menos uma vez, e cada consumidor roda uma mensagem uma vez.
 

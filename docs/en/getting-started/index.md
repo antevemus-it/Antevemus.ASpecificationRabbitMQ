@@ -8,7 +8,7 @@ Install via Composer:
 composer require antevemus/aspecification-rabbitmq
 ```
 
-Requirements: PHP 8.2 or later with `ext-sockets` and `ext-mbstring`, and a RabbitMQ 3.13 or later (the queues are quorum queues). Installed with it: [`antevemus/aspecification`](https://github.com/antevemus-it/Antevemus.ASpecification) `^2.14` (the core, from the same author, which has the messaging hook) and [`php-amqplib/php-amqplib`](https://github.com/php-amqplib/php-amqplib) `^3.7` (a pure PHP AMQP 0-9-1 client; the `amqp` PECL extension is not needed).
+Requirements: PHP 8.2 or later with `ext-sockets` and `ext-mbstring`, and a RabbitMQ 3.13 or later (the queues are quorum queues). Installed with it: [`antevemus/aspecification`](https://github.com/antevemus-it/Antevemus.ASpecification) `^2.15` (the core, from the same author, which has the messaging hook) and [`php-amqplib/php-amqplib`](https://github.com/php-amqplib/php-amqplib) `^3.7` (a pure PHP AMQP 0-9-1 client; the `amqp` PECL extension is not needed).
 
 What it is for: carrying the messages of the core's messaging hook between the modules of an application through RabbitMQ. The application publishes to the outbox of the core, inside its own transaction; the relay of the core sends the outbox with `RabbitMqTransport`; each consumer reads its own queue with `RabbitMqSource` through the core's `MessageConsumer`, which deduplicates by an inbox. Delivery is at least once, and each consumer runs a message once.
 

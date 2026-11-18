@@ -3,6 +3,7 @@
 ## Shipped
 
 - **1.0.0:** `RabbitMqTransport` (publisher confirms, the mandatory flag, nacks and connection failures per message), `RabbitMqSource` (pull with manual acknowledgements, the delivery count of a quorum queue, requeues kept in order, dead letters with their reason through a dead letter exchange), `RabbitMqTopology` (a topic exchange, a quorum queue per consumer bound by patterns, a dead letter exchange and queue, idempotent) and `RabbitMqConnector` (host and credentials, an `amqp://` URL or a factory of the application).
+- **1.0.1:** the suite runs the contract battery of the core (`antevemus/aspecification` ^2.15) against RabbitMQ, in place of the private battery of 1.0.0; the tests of what is RabbitMQ's own stay. The API does not change.
 
 ## On demand
 

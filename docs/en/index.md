@@ -22,11 +22,11 @@ The official documentation of the package, one page per topic. The same pages ex
 
 ### Quality
 
-- [Tests](quality/tests.md): The contract battery over the core and over RabbitMQ, the failures, the property and the mutation testing.
+- [Tests](quality/tests.md): The contract battery of the core run against RabbitMQ, the tests of what is RabbitMQ's own, and the mutation testing.
 
 ### Project
 
-- [Roadmap](project/roadmap.md): The release shipped and what may come next.
+- [Roadmap](project/roadmap.md): The releases shipped and what may come next.
 
 ## Where Is Each Thing
 

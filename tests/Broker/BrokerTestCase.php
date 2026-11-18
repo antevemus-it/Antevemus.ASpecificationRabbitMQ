@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  * A test against the real broker: skipped when it is not reachable; a bench of its own (a unique topology,
  * removed at the end).
  *
- * @version    1.0.0
+ * @version    1.0.1
  * @package    Antevemus\ASpecificationRabbitMQ\Tests
  * @subpackage Broker
  */
@@ -40,7 +40,7 @@ abstract class BrokerTestCase extends TestCase
     protected function tearDown(): void
     {
         if (isset($this->bench)) {
-            $this->bench->tearDown();
+            $this->bench->close();
         }
     }
 

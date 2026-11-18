@@ -11,9 +11,8 @@ Without a reachable broker the tests that need one are skipped, with the reason 
 | Folder | What |
 | :--- | :--- |
 | `Unit/` | No broker: the connector, the topology (declarations recorded on a mocked channel), the transport and the source on a scripted broker (`Support/ScriptedBroker`), the shared helpers, and the documentation (`DocumentationTreeTest`, `DocumentationBlocksTest`; the blocks that talk to a broker are skipped without one). |
-| `Contract/` | The contract battery (`MessagingContractTestCase`), run over the core's in-memory pair (`InMemoryContractTest`) and over RabbitMQ (`RabbitMqContractTest`), with the same expected transcripts. |
-| `Broker/` | Against the broker: the transport, the source, the topology, and the failure scenarios with the secrecy sweep (`FailureScenariosTest`). |
-| `Property/` | Random interleavings of publish, relay and consume with fixed seeds, over both pairs (`InterleavingPropertyTest`). |
-| `Support/` | The benches (`MessagingBench`, `InMemoryBench`, `RabbitMqBench`), the test broker (`TestBroker`), the scripted broker, the effects of the handlers (`EffectLog`) and messages with an alias (`TestMessages`). |
+| `Contract/` | The contract battery of the core (`MessagingContractTestCase` of `antevemus/aspecification` ^2.15, every scenario and the property sequence), run over RabbitMQ (`RabbitMqContractTest`); the core runs it against its in-memory reference. How a satellite wires it: [Writing a satellite](https://github.com/antevemus-it/Antevemus.ASpecification/blob/main/docs/en/messaging/writing-a-satellite.md), in the documentation of the core. |
+| `Broker/` | Against the broker: the transport, the source, the topology, and the failures that are RabbitMQ's own (`FailureScenariosTest`: a socket cut before an acknowledgement, a broker that cannot be reached, the mandatory flag, the secrecy of the dead letter headers and of a connection error). |
+| `Support/` | The bench of the battery over RabbitMQ (`RabbitMqBench`, an `IMessagingBench` of the core), the test broker (`TestBroker`), the scripted broker, the effects of the handlers (`EffectLog`) and messages with an alias (`TestMessages`). |
 
-1.0.0: 168 tests (113 without a broker). Mutation testing: see `infection.json5`.
+1.0.1: 164 tests (98 without a broker). Mutation testing: see `infection.json5`.

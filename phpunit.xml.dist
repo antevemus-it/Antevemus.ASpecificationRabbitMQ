@@ -4,8 +4,9 @@
 
   Coverage is not configured by default so that the run does not require Xdebug or PCOV.
 
-  The groups Contract (the RabbitMQ half), Broker and Property, and the blocks of the documentation that talk to
-  a broker, need a RabbitMQ 3.13 (quorum queues): they are skipped, with the reason, when it cannot be reached.
+  The groups Contract (the contract battery of the core, antevemus/aspecification ^2.15, over RabbitMQ) and
+  Broker, and the blocks of the documentation that talk to a broker, need a RabbitMQ 3.13 (quorum queues): they
+  are skipped, with the reason, when it cannot be reached (the CI runs with fail-on-skipped).
   The broker is read from the environment (the values below are the defaults; a variable set outside wins):
 
     docker run -d -p 5672:5672 rabbitmq:3.13
@@ -34,9 +35,6 @@
         </testsuite>
         <testsuite name="Broker">
             <directory>tests/Broker</directory>
-        </testsuite>
-        <testsuite name="Property">
-            <directory>tests/Property</directory>
         </testsuite>
     </testsuites>
 
